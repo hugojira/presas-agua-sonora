@@ -1,0 +1,21 @@
+# R stuff
+**/.Rhistory
+**/.RData
+**/.Ruserdata
+**/.Rproj.user
+**/.Rprofile
+.Rproj.user
+
+# MacOS stuff
+**/.DS_Store
+
+#DataSpell stuff
+ **/.idea/**/*.iml
+**/.idea/**/contentModel.xml
+**/.idea/**/modules.xml
+.idea
+.idea/*
+
+# jupyter notebook python stuff
+*/.ipynb_checkpoints/*
+.ipynb_checkpoints/
