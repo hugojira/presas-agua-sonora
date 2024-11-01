@@ -1,0 +1,119 @@
+---
+title: "Concatenar datos históricos en uno solo"
+#output: html_notebook
+---
+
+
+```{r}
+# ----- Este fragmento de código fue obtenido con ayuda de la IA de Google, Gemini -----
+library(tidyverse)
+library(readxl)
+
+# Directorio donde se encuentran los archivos
+directorio <- "/Users/hugo/Rprojects/presas-agua-sonora/data/raw"
+
+# Encontrar todos los archivos que coincidan con el patrón
+archivos <- list.files(path = directorio, pattern = "hidrico_sonora_[0-9]{4}-[0-9]{4}.xlsx")
+
+# Leer y combinar los archivos
+datos_1970_2019 <- map_df(archivos, function(x) {
+  read_excel(file.path(directorio, x))
+})
+
+#-------------------------------------
+
+```
+
+Ahora, los datos combinados están hasta el 2019, primero convertimos sus columnas
+a los respectivos tipos y leemos el último archivo de 2019 a la actualidad.
+
+```{r}
+# conviertiendo columna de almacenamiento en numerica, y fecha en date
+datos_1970_2019 <- datos_1970_2019 %>% 
+  mutate(Fecha = ymd(Fecha)) %>%
+  rename(Almacenamiento = `Almacenamiento(hmÂ³)`) %>%
+  #mutate(Almacenamiento = ifelse(Almacenamiento == "-", NA, as.numeric(Almacenamiento)))
+  mutate(Almacenamiento = as.numeric(Almacenamiento))
+
+
+```
+Leyendo los datos de 2019 a la actualidad (2024), conviertiendo fechas en fechas y
+almacenamiento en numérica
+```{r}
+datos_2019_actualidad <- read_excel(paste0(directorio, "/hidrico_sonora_2020-actualidad2024.xlsx")) %>% mutate(Fecha = ymd(Fecha)) %>%
+  rename(Almacenamiento = `Almacenamiento(hmÂ³)`) %>%
+  mutate(Almacenamiento = as.numeric(Almacenamiento))
+```
+
+## Concatenando todos los dataframes en uno solo
+
+```{r}
+datos_completos <- rbind(datos_1970_2019, datos_2019_actualidad)
+```
+
+## Tomando el inicio de los datos
+
+Para simplificar los datos, lo que haremos es buscar la fecha para la cual cada presa
+comenzó a tener mediciones, así llegaremos a la fecha para la cual todas las presas
+ya tuvieron su primera medición. Esa fecha será en la cual comenzaremos los datos.
+
+Para esto, se tiene el siguiente script, el cual fue obtenido con ayuda de Gemini, 
+la IA de Google
+
+```{r}
+# Suponiendo que los datos están en un tibble llamado "datos_completos"
+# con las columnas "Presa", "Fecha" y "Almacenamiento"
+
+# Ordenar los datos por presa y fecha
+datos_ordenados <- datos_completos %>%
+  arrange(Clave, Fecha)
+
+# Agrupar por presa y encontrar la primera fecha con datos
+fecha_inicio_por_presa <- datos_ordenados %>%
+  group_by(Clave) %>%
+  summarize(primera_fecha = min(Fecha[which(!is.na(Almacenamiento))]))
+
+# Encontrar la fecha más tardía entre todas las presas
+fecha_inicio_general <- max(fecha_inicio_por_presa$primera_fecha)
+
+# Imprimir el resultado
+print(fecha_inicio_general)
+
+```
+
+Podemos ver que la fecha máxima es "2023-03-27" para la presa Bicentenario, sin embargo,
+usarmeos como corte la presa El Molinito, que tiene sus inicios de mediciones en la fecha
+"1993-02-01".
+
+```{r}
+# Fehca considerada para el inicio de los datos
+fecha_corte <- fecha_inicio_por_presa %>% filter(Clave == "PMOSO") %>%
+  pull(primera_fecha)
+print(fecha_corte)
+```
+
+
+Exportamos los inicio de datos para cada presa en un archivo .txt por si se necesita
+para futuras referencias
+
+```{r}
+dir_output <- "/Users/hugo/Rprojects/presas-agua-sonora/output"
+write_csv(fecha_inicio_por_presa, 
+          paste0(dir_output, "/fecha_inicio_mediciones_por_presa.csv"))
+```
+
+## Partimos los datos a partir de la fecha obtenida
+Partimos los datos a partir de la fecha en que la presa el molinito tiene datos
+
+```{r}
+datos_simplificados <- datos_completos %>% filter(Fecha >= fecha_corte)
+```
+
+## Exportamos los datos a un archivo en la carpeta de datos procesados
+
+```{r}
+dir_data <- "/Users/hugo/Rprojects/presas-agua-sonora/data/processed"
+write_csv(datos_simplificados, 
+          paste0(dir_data, "/almacenamientos_con_NAs.csv"))
+```
+
