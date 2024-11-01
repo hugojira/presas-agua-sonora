@@ -1,0 +1,103 @@
+---
+title: "R Notebook"
+#output: html_notebook
+---
+
+## Librerias
+
+```{r}
+library(tidyverse)
+```
+
+## Leer datos
+
+```{r}
+dir_data <- "/Users/hugo/Rprojects/presas-agua-sonora/data/processed/"
+datos_raw <- read_csv(
+  paste0(dir_data, "almacenamientos_con_NAs.csv")
+)
+```
+## Explorar valores faltantes
+
+Primero vemos en que presas hay valores faltantes
+```{r}
+# Crear una nueva variable que indique si el valor de almacenamiento es NA
+datos_raw <- datos_raw %>% 
+  mutate(es_NA = is.na(Almacenamiento))
+
+# Contar los valores NA por presa
+datos_faltantes <- datos_raw %>%
+  group_by(Clave) %>%
+  summarize(total_NA = sum(es_NA))
+
+datos_faltantes
+
+```
+Vemos que hay 216 valores faltantes en total.
+214 para la presa IRASO - Ignacio R Alatorre y 2 para la presa PMOSO El Molinito.
+
+### Visualización
+
+```{r}
+library(ggplot2)
+
+# Filtrar los datos para quedarnos solo con los valores NA
+datos_faltantes_2 <- datos_raw %>%
+  filter(es_NA == TRUE) %>% mutate(Almacenamiento = 0)
+
+# Crear un gráfico de puntos para cada presa, mostrando solo los valores NA
+ggplot(datos_faltantes_2, aes(x = Fecha, y = Almacenamiento)) +
+  geom_point() +
+  facet_wrap(~ Clave, scales = "free_x") +
+  labs(title = "Ubicación de los Datos Faltantes por Presa",
+       x = "Fecha",
+       y = NULL) # Eliminamos el eje y ya que no aporta información en este caso
+```
+
+Así, nos damos una idea de los datos faltantes que hay y como estan distribuidos. 
+Vemos que los datos falntantes no son ni el primero ni el ultimo en las fechas que tenemos, esto servira para las imputaciones.
+
+## Imputación de los datos de almacenamiento faltantes
+
+Ahora, cómo los datos de almacenamiento de agua pueden variar bastante en los años. Usaremos un método de imputación con base a la mediana para imputar los 216 datos faltantes en las 2 presas mencionadas.
+
+El código se obtuvo con ayuda de Gemini y fue verificado y modificado acorde a nuetras necesidades.
+
+```{r}
+# Suponiendo que los datos están en un data frame llamado "datos_raw"
+# con las columnas "Presa", "Fecha" y "Almacenamiento"
+
+# Función para imputar valores faltantes por la mediana para cada presa
+imputar_por_mediana <- function(datos_presa) {
+  datos_presa %>%
+    group_by(Clave) %>%
+    mutate(
+      Almacenamiento = ifelse(
+        is.na(Almacenamiento),
+        median(Almacenamiento, na.rm = TRUE),
+        Almacenamiento
+      )
+    )
+}
+
+# Aplicar la función a cada presa y crear un nuevo data frame con los datos imputados
+datos_imputados <- datos_raw %>%
+  group_by(Clave) %>%
+  do(imputar_por_mediana(.)) %>%
+  ungroup()
+```
+
+Corroboramos que ya no hay datos faltantes
+
+```{r}
+sum(is.na(datos_imputados))
+```
+
+## Exportamos los datos a un archivo csv
+
+```{r}
+# eliminamos la columna auxiliar es_NA
+datos_imputados %>% select(-es_NA) %>%
+write_csv(paste0(dir_data, "almacenamiento_sin_NAs.csv"))
+```
+
