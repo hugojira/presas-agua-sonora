@@ -1,0 +1,11 @@
+Clave,Comision,Subdireccion,Presa,Nombre_comun,Estado,Municipio,cap_name,cap_namo,vol_muerto,Río,Numero,Latitud,Longitud,Altitud,Identificador_cuenca_disponibilidad,Cuenca de disponibilidad,Numero_region_hidrologica,Region_hidrológica
+LCDSO,Comisión Nacional del Agua,Subdirección General Técnica,Lázaro Cárdenas,La Angostura, Sonora, Nacozari de García,1116,703,10,Río Yaqui,181,30.437778,-109.378889,860,102,Río Bavispe,9,Sur
+PECSO,Comisión Nacional del Agua,Subdirección General Técnica,Plutarco Elías Calles,El Novillo, Sonora, Soyopa,3312,2833,200,Río Yaqui,182,28.976667,-109.642222,2110,103,Río Yaqui 1,9,Sur
+AOBSO,Comisión Nacional del Agua,Subdirección General Técnica,Álvaro Obregón,Oviachic, Sonora, Cajeme,4409,3023,23,Río Yaqui,177,27.8225,-109.8925,116,104,Río Yaqui 2,9,Sur
+AGZCH,Comisión Nacional del Agua,Subdirección General Técnica,Abraham González,Guadalupe, Chihuahua, Guerrero,103,79,2,Otros,25,28.481667,-107.482778,2020,103,Río Yaqui 1,9,Sur
+ARCSO,Comisión Nacional del Agua,Subdirección General Técnica,Adolfo Ruiz Cortines,Mocúzari, Sonora, Alamos,1823,1200,8,Río Mayo,175,27.226111,-109.106667,148,108,Río Mayo 2,9,Sur
+PMOSO,Comisión Nacional del Agua,Subdirección General Técnica,Ing. Rodolfo Félix Valdés,El Molinito, Sonora, Hermosillo,222,121,15,Río Sonora,180,29.2125,-110.725556,321,100,Río Sonora 2,9,Sur
+ARLSO,Comisión Nacional del Agua,Subdirección General Técnica,Abelardo Rodríguez Luján,Hermosillo, Sonora, Hermosillo,284,220,2,Río Sonora,179,29.076667,-110.92,230,100,Río Sonora 2,9,Sur
+CHTSO,Comisión Nacional del Agua,Subdirección General Técnica,Cuauhtémoc,Santa Teresa, Sonora, Tubutama,66,42,2,Otros,183,30.873333,-111.516389,590,92,Río Magdalena,8,Norte
+IRASO,Comisión Nacional del Agua,Subdirección General Técnica,Ignacio R. Alatorre,Punta de Agua, Sonora, Guaymas,30,16,0,Otros,178,28.426389,-110.396944,245,110,Río Mátape,9,Sur
+BICSO,Comisión Nacional del Agua,Subdirección General Técnica,Bicentenario,Los Pilares,Sonora,Álamos,466,393,0,Río Mayo,0,27,-109,164,108,Río Mayo,9,Sur
